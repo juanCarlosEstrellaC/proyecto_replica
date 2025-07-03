@@ -4,15 +4,19 @@ import com.programacion.distribuida.modelo.Autor;
 import com.programacion.distribuida.repository.AutorRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.ConfigProvider;
 
+import java.util.List;
+
 @Path("/autores")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @ApplicationScoped
+@Transactional
 public class AutorController {
     // No necesario el @Transacctional, basta que esté en el Repository
 
@@ -32,6 +36,9 @@ public class AutorController {
     @GET
     public Response buscarTodos() {
         var autores = autorRepository.findAll().list();
+        if (autores.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         return Response.ok(autores).build();
     }
 

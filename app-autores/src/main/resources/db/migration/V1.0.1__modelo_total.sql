@@ -10,13 +10,13 @@ ALTER TABLE ONLY public.autores ALTER COLUMN nombre SET STATISTICS 0;
 ALTER TABLE ONLY public.autores ALTER COLUMN version SET STATISTICS 0;
 
 CREATE TABLE public.libros_autores (
-    libros_isbn varchar(255) NOT NULL,
-    autores_id integer NOT NULL
+    libro_isbn varchar(255) NOT NULL,
+    autor_id integer NOT NULL
 )
 WITH (oids = false);
 
-ALTER TABLE ONLY public.libros_autores ALTER COLUMN libros_isbn SET STATISTICS 0;
-ALTER TABLE ONLY public.libros_autores ALTER COLUMN autores_id SET STATISTICS 0;
+ALTER TABLE ONLY public.libros_autores ALTER COLUMN libro_isbn SET STATISTICS 0;
+ALTER TABLE ONLY public.libros_autores ALTER COLUMN autor_id SET STATISTICS 0;
 
 CREATE TABLE public.libros (
     isbn varchar(255) NOT NULL,
@@ -93,11 +93,11 @@ ALTER TABLE ONLY public.autores
 
 ALTER TABLE ONLY public.libros_autores
     ADD CONSTRAINT pk_libros_autores
-    PRIMARY KEY (libros_isbn, autores_id);
+    PRIMARY KEY (libro_isbn, autor_id);
 
 ALTER TABLE ONLY public.libros_autores
     ADD CONSTRAINT fk_libros_autores_autores
-    FOREIGN KEY (autores_id) REFERENCES autores(id);
+    FOREIGN KEY (autor_id) REFERENCES autores(id);
 
 ALTER TABLE ONLY public.libros
     ADD CONSTRAINT pk_libros
@@ -113,7 +113,7 @@ ALTER TABLE ONLY public.inventario
 
 ALTER TABLE ONLY public.libros_autores
     ADD CONSTRAINT fk_libros_autores_libros
-    FOREIGN KEY (libros_isbn) REFERENCES libros(isbn);
+    FOREIGN KEY (libro_isbn) REFERENCES libros(isbn);
 
 ALTER TABLE ONLY public.clientes
     ADD CONSTRAINT pk_clientes
