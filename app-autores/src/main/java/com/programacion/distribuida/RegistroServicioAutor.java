@@ -16,8 +16,16 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.UUID;
 
+/**  Ciclo de vida del servicio de Autores
+* Registra el servicio en Consul al iniciar la aplicación y lo elimina al detenerla.
+* Este ciclo de vida es necesario para que Traefik pueda enrutar las peticiones al servicio de Autores.
+*
+* Consul es un servicio que registra, descubre y monitorea la salud de los servicios en tu red.
+* Traefik es un proxy inverso que dirige automáticamente el tráfico al servicio correcto según reglas y descubrimiento.
+*/
+
 @ApplicationScoped
-public class AutorCicloDeVida {
+public class RegistroServicioAutor {
 
     // Inyección de propiedades de configuración
     @Inject
@@ -35,8 +43,9 @@ public class AutorCicloDeVida {
     // ID del servicio (una instancia de app-autores). Generará un id único para identificar el servicio en Consul.
     String idServicio;
 
-    // Metodo para registrar el servicio en Consul al iniciar la aplicación.
-    void registrarServicioEnConsul(@Observes StartupEvent evento, Vertx vertx){ // TODO quité el throws Exception, revisar si es necesario
+    // Metodo para registrar el servicio en Consul al iniciar la aplicación. Se ejecuta al inicio de la aplicación
+    // automáticamente gracias a la anotación @Observes en el evento StartupEvent.
+    void registrarServicioEnConsul(@Observes StartupEvent eventoInicioApp, Vertx vertx){ // TODO quité el throws Exception, revisar si es necesario
         try {
             System.out.println("Iniciando servicio de Autores...");
             ConsulClientOptions opciones = new ConsulClientOptions()
@@ -55,7 +64,10 @@ public class AutorCicloDeVida {
                     "traefik.http.middlewares.strip-prefix-autores.stripPrefix.prefixes=/app-autores"
             );
 
-            // Configurar las opciones de verificación del servicio. Verifica que el servicio esté activo y respondiendo.
+            /* Configurar las opciones de verificación del servicio (healthcheck de Consul). Verifica que el servicio
+               esté activo y respondiendo. La verificación se realiza enviando una petición HTTP al endpoint /ping del
+               servicio. Si el servicio no responde, Consul lo considerará inactivo y lo eliminará de su registro
+               después de 20 segundos. */
             var opcionesVerificacion = new CheckOptions()
                     .setHttp(String.format("http://%s:%d/ping", InetAddress.getLocalHost().getHostName(), httpPort))
                     .setInterval("10s")
@@ -77,8 +89,9 @@ public class AutorCicloDeVida {
         }
     }
 
-    // Metodo para eliminar el servicio de Consul al detener la aplicación.
-    void eliminarServicioDeConsul(@Observes ShutdownEvent evento, Vertx vertx) {
+    // Metodo para eliminar el servicio de Consul al detener la aplicación. Se ejecuta al finalizar la aplicación
+    // automáticamente gracias a la anotación @Observes en el evento ShutdownEvent.
+    void eliminarServicioDeConsul(@Observes ShutdownEvent eventoFinApp, Vertx vertx) {
         try {
             System.out.println("Deteniendo servicio de Autores...");
             ConsulClientOptions opciones = new ConsulClientOptions()

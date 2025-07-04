@@ -1,4 +1,4 @@
-package com.programacion.distribuida.controller;
+package com.programacion.distribuida.rest;
 
 import com.programacion.distribuida.modelo.Autor;
 import com.programacion.distribuida.repository.AutorRepository;
@@ -10,14 +10,12 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.ConfigProvider;
 
-import java.util.List;
-
 @Path("/autores")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @ApplicationScoped
 @Transactional
-public class AutorController {
+public class AutorRest {
     // No necesario el @Transacctional, basta que esté en el Repository
 
     @Inject
