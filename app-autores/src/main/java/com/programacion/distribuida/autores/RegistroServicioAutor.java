@@ -1,4 +1,4 @@
-package com.programacion.distribuida;
+package com.programacion.distribuida.autores;
 
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
@@ -17,11 +17,12 @@ import java.util.List;
 import java.util.UUID;
 
 /**  Ciclo de vida del servicio de Autores
-* Registra el servicio en Consul al iniciar la aplicación y lo elimina al detenerla.
-* Este ciclo de vida es necesario para que Traefik pueda enrutar las peticiones al servicio de Autores.
-*
-* Consul es un servicio que registra, descubre y monitorea la salud de los servicios en tu red.
-* Traefik es un proxy inverso que dirige automáticamente el tráfico al servicio correcto según reglas y descubrimiento.
+ * Registra el servicio en Consul al iniciar la aplicación y lo elimina al detenerla.
+ * Este ciclo de vida es necesario para que Traefik pueda enrutar las peticiones al servicio de Autores.
+ *
+ * Consul es un servicio que registra, descubre y monitorea la salud de los servicios en tu red.
+ * Traefik es un proxy inverso y balanceador de carga (a nivel de red) que dirige automáticamente el tráfico al servicio
+ * correcto según reglas y descubrimiento.
 */
 
 @ApplicationScoped

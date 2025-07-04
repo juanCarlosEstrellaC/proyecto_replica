@@ -1,4 +1,4 @@
-package com.programacion.distribuida.rest;
+package com.programacion.distribuida.autores.rest;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

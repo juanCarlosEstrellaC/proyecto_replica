@@ -1,4 +1,4 @@
-package com.programacion.distribuida.modelo;
+package com.programacion.distribuida.autores.modelo;
 
 import jakarta.persistence.*;
 import lombok.Data;

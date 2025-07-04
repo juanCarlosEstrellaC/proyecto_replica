@@ -27,27 +27,27 @@ dependencies {
     // REST
     implementation("io.quarkus:quarkus-rest")
     implementation("io.quarkus:quarkus-rest-jsonb")
+    // Rest Client: para consumir servicios REST
+    implementation("io.quarkus:quarkus-rest-client")
+    implementation("io.quarkus:quarkus-rest-client-jsonb")
 
     // JPA
     implementation("io.quarkus:quarkus-hibernate-orm-panache")
     implementation("io.quarkus:quarkus-jdbc-postgresql")
 
-    // Control de versiones Flyway
-    implementation("io.quarkus:quarkus-flyway")
-    implementation("org.flywaydb:flyway-database-postgresql")
+    // Model Mapper
+    implementation("org.modelmapper:modelmapper:3.2.3")
 
     // Service Discovery dinámico con Consul
     implementation("io.quarkus:quarkus-smallrye-stork")
     implementation("io.smallrye.stork:stork-service-discovery-consul")
     implementation("io.smallrye.reactive:smallrye-mutiny-vertx-consul-client") // Mutiny para programación reactiva
 
-    // Telemetria: metricas
-    implementation("io.quarkus:quarkus-micrometer-registry-prometheus")
-    implementation("io.quarkus:quarkus-jackson")
+    // Quarkus Fault Tolerance
+    implementation("io.quarkus:quarkus-smallrye-fault-tolerance")
 }
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.compilerArgs.add("-parameters")
-
 }

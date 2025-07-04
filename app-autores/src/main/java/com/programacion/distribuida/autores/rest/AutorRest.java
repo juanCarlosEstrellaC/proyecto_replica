@@ -1,7 +1,7 @@
-package com.programacion.distribuida.rest;
+package com.programacion.distribuida.autores.rest;
 
-import com.programacion.distribuida.modelo.Autor;
-import com.programacion.distribuida.repository.AutorRepository;
+import com.programacion.distribuida.autores.modelo.Autor;
+import com.programacion.distribuida.autores.repository.AutorRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;

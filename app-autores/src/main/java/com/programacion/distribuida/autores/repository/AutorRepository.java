@@ -1,6 +1,6 @@
-package com.programacion.distribuida.repository;
+package com.programacion.distribuida.autores.repository;
 
-import com.programacion.distribuida.modelo.Autor;
+import com.programacion.distribuida.autores.modelo.Autor;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
