@@ -34,6 +34,10 @@ public class RegistroServicioAutor {
     Integer httpPort;
 
     @Inject
+    @ConfigProperty(name = "quarkus.http.host", defaultValue = "localhost")
+    String httpHost;
+
+    @Inject
     @ConfigProperty(name = "consul.host", defaultValue = "localhost")
     String consulHost;
 
@@ -69,8 +73,14 @@ public class RegistroServicioAutor {
                esté activo y respondiendo. La verificación se realiza enviando una petición HTTP al endpoint /ping del
                servicio. Si el servicio no responde, Consul lo considerará inactivo y lo eliminará de su registro
                después de 20 segundos. */
+            var direccionIp = InetAddress.getLocalHost();
+            System.out.printf("*************IP Address: %s\n", direccionIp.getHostAddress());
+            System.out.println("Puerto HTTP del servicio: " + httpPort);
+            System.out.println("Host HTTP del servicio: " + httpHost);
             var opcionesVerificacion = new CheckOptions()
-                    .setHttp(String.format("http://%s:%d/ping", InetAddress.getLocalHost().getHostName(), httpPort))
+                    //.setHttp("http://127.0.0.1:8080/ping")
+                    //.setHttp(String.format("http://%s:%s/ping", direccionIp.getHostAddress(), httpPort))
+                    .setHttp(String.format("http://%s:%s/ping", httpHost, httpPort)) // TODO cambie de direccionIp a httpHost (0.0.0.0)
                     .setInterval("10s")
                     .setDeregisterAfter("20s");
 
