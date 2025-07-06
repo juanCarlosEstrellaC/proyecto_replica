@@ -1,4 +1,4 @@
-package com.programacion.distribuida.autores;
+package com.programacion.distribuida.libros;
 
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
@@ -16,21 +16,22 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.UUID;
 
-/**  Ciclo de vida del servicio de Autores
+/**
+ * Ciclo de vida del servicio de Libros
  * Registra el servicio en Consul al iniciar la aplicación y lo elimina al detenerla.
- * Este ciclo de vida es necesario para que Traefik pueda enrutar las peticiones al servicio de Autores.
- *
+ * Este ciclo de vida es necesario para que Traefik pueda enrutar las peticiones al servicio de Libros.
+ * <p>
  * Consul es un servicio que registra, descubre y monitorea la salud de los servicios en tu red.
  * Traefik es un proxy inverso y balanceador de carga (a nivel de red) que dirige automáticamente el tráfico al servicio
  * correcto según reglas y descubrimiento.
-*/
+ */
 
 @ApplicationScoped
-public class RegistroServicioAutor {
+public class RegistroServicioLibro {
 
     // Inyección de propiedades de configuración
     @Inject
-    @ConfigProperty(name = "quarkus.http.port", defaultValue = "8080")
+    @ConfigProperty(name = "quarkus.http.port", defaultValue = "9090")
     Integer httpPort;
 
     @Inject
@@ -50,9 +51,9 @@ public class RegistroServicioAutor {
 
     // Metodo para registrar el servicio en Consul al iniciar la aplicación. Se ejecuta al inicio de la aplicación
     // automáticamente gracias a la anotación @Observes en el evento StartupEvent.
-    void registrarServicioEnConsul(@Observes StartupEvent eventoInicioApp, Vertx vertx){ // TODO quité el throws Exception, revisar si es necesario
+    void registrarServicioEnConsul(@Observes StartupEvent eventoInicioApp, Vertx vertx) { // TODO quité el throws Exception, revisar si es necesario
         try {
-            System.out.println("Iniciando servicio de Autores...");
+            System.out.println("Iniciando servicio de Libros...");
             ConsulClientOptions opciones = new ConsulClientOptions()
                     .setHost(consulHost)
                     .setPort(consulPort);
@@ -64,9 +65,9 @@ public class RegistroServicioAutor {
             // Definir las etiquetas del servicio para que Traefik pueda enrutar las peticiones.
             var etiquetas = List.of(
                     "traefik.enable=true",
-                    "traefik.http.routers.app-autores.rule=PathPrefix(`/app-autores`)",
-                    "traefik.http.routers.app-autores.middlewares=strip-prefix-autores",
-                    "traefik.http.middlewares.strip-prefix-autores.stripPrefix.prefixes=/app-autores"
+                    "traefik.http.routers.app-libros.rule=PathPrefix(`/app-libros`)",
+                    "traefik.http.routers.app-libros.middlewares=strip-prefix-libros",
+                    "traefik.http.middlewares.strip-prefix-libros.stripPrefix.prefixes=/app-libros"
             );
 
             /* Configurar las opciones de verificación del servicio (healthcheck de Consul). Verifica que el servicio
@@ -87,16 +88,16 @@ public class RegistroServicioAutor {
             // Registrar el servicio en Consul
             ServiceOptions opcionesServicio = new ServiceOptions()
                     .setId(idServicio)
-                    .setName("app-autores")
+                    .setName("app-libros")
                     //.setAddress(InetAddress.getLocalHost().getHostAddress())
-                    .setAddress(httpHost)  // TODO Cambié de direccionIp a localhost, para que funcione.
+                    .setAddress(httpHost) // TODO Cambié de direccionIp a localhost, para que funcione.
                     .setPort(httpPort)
                     .setTags(etiquetas)
                     .setCheckOptions(opcionesVerificacion);
             clienteConsul.registerServiceAndAwait(opcionesServicio);
 
         } catch (Exception ex) {
-            System.err.println("Error al iniciar el servicio de autores: " + ex.getMessage());
+            System.err.println("Error al iniciar el servicio de libros: " + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -105,7 +106,7 @@ public class RegistroServicioAutor {
     // automáticamente gracias a la anotación @Observes en el evento ShutdownEvent.
     void eliminarServicioDeConsul(@Observes ShutdownEvent eventoFinApp, Vertx vertx) {
         try {
-            System.out.println("Deteniendo servicio de Autores...");
+            System.out.println("Deteniendo servicio de Libros...");
             ConsulClientOptions opciones = new ConsulClientOptions()
                     .setHost(consulHost)
                     .setPort(consulPort);
@@ -114,7 +115,7 @@ public class RegistroServicioAutor {
             // Desregistrar el servicio de Consul
             clienteConsul.deregisterServiceAndAwait(idServicio);
         } catch (Exception ex) {
-            System.err.println("Error al detener el servicio de autores: " + ex.getMessage());
+            System.err.println("Error al detener el servicio de libros: " + ex.getMessage());
             ex.printStackTrace();
         }
     }

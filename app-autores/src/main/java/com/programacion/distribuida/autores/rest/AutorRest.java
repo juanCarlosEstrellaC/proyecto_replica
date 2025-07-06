@@ -10,6 +10,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.ConfigProvider;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Path("/autores")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -40,11 +42,20 @@ public class AutorRest {
         return Response.ok(autores).build();
     }
 
+    // Simulación de errores
+    AtomicInteger contador = new AtomicInteger();
+    
     @GET
     @Path("/libro/{isbn}")
     public Response buscarPorLibro(@PathParam("isbn") String isbn) {
 
-        // Falta simulación de errores
+        // Simulación de errores: De 5 llamadas, 4 son fallas y 1 éxito.
+        int intento = contador.getAndIncrement();
+        if (intento % 5 != 0) {
+            String mensaje = String.format("Intento %d, generando error.", intento);
+            System.out.println(mensaje);
+            throw new RuntimeException(mensaje);
+        }
 
         var puerto = ConfigProvider.getConfig().getValue("quarkus.http.port", Integer.class);
         var autores = autorRepository.buscarPorLibro(isbn);
