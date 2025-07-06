@@ -1,0 +1,27 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'metricas-autores'
+    metrics_path: '/q/metrics'
+    static_configs:
+      - targets: ['autores:8080']
+
+  - job_name: 'metricas-libros'
+    metrics_path: '/q/metrics'
+    static_configs:
+      - targets: ['books:8080']
+
+  - job_name: 'metricas-prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'metricas-traefik_proxy'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['traefik_proxy:8082']
+
+  - job_name: 'metricas-postgres'
+    static_configs:
+      - targets: ['metricas_base_datos:9187']
