@@ -10,6 +10,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.ConfigProvider;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Path("/autores")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -40,11 +42,25 @@ public class AutorRest {
         return Response.ok(autores).build();
     }
 
+    /** Simulación de errores
+     * Se usa un AtomicInteger para contar los intentos de llamada al endpoint, ya que AtomicInteger permite un acceso
+     * seguro en entornos concurrentes. Este es un entorno concurrente porque el microservicio puede recibir múltiples
+     * solicitudes al mismo tiempo, y cada solicitud incrementa el contador de intentos.
+     * AtomicInteger garantiza que las operaciones de incremento sean atómicas y seguras entre hilos.
+    */
+    AtomicInteger contador = new AtomicInteger();
+    
     @GET
     @Path("/libro/{isbn}")
     public Response buscarPorLibro(@PathParam("isbn") String isbn) {
 
-        // Falta simulación de errores
+        // Simulación de errores: De 5 llamadas, 4 son fallas y 1 éxito.
+        int intento = contador.getAndIncrement();
+        if (intento % 5 != 0) {
+            String mensaje = String.format("Intento %d, generando error.", intento);
+            System.out.println(mensaje);
+            throw new RuntimeException(mensaje);
+        }
 
         var puerto = ConfigProvider.getConfig().getValue("quarkus.http.port", Integer.class);
         var autores = autorRepository.buscarPorLibro(isbn);
