@@ -11,11 +11,11 @@ scrape_configs:
   - job_name: 'metricas-libros'
     metrics_path: '/q/metrics'
     static_configs:
-      - targets: ['books:8080']
+      - targets: ['libros:8080']
 
   - job_name: 'metricas-prometheus'
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ['prometheus_metricas:9090'] #TODO: Cambie localhost por el nombre del servicio en Docker Compose
 
   - job_name: 'metricas-traefik_proxy'
     metrics_path: '/metrics'

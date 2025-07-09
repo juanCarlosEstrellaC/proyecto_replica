@@ -78,9 +78,10 @@ public class RegistroServicioAutor {
             System.out.println("Puerto HTTP del servicio: " + httpPort);
             System.out.println("Host HTTP del servicio: " + httpHost);
             var opcionesVerificacion = new CheckOptions()
+                    // TODO: Para contenedores se usa la IP del contenedor. Usar localhost sin contenedores.
                     //.setHttp("http://127.0.0.1:8080/ping")
-                    //.setHttp(String.format("http://%s:%s/ping", direccionIp.getHostAddress(), httpPort))
-                    .setHttp(String.format("http://%s:%s/ping", httpHost, httpPort)) // TODO cambie de direccionIp a localhost, para que funcione.
+                    //.setHttp(String.format("http://%s:%s/ping", httpHost, httpPort)) // TODO: Sin contenedores, usar localhost.
+                    .setHttp(String.format("http://%s:%s/ping", direccionIp.getHostAddress(), httpPort))
                     .setInterval("10s")
                     .setDeregisterAfter("20s");
 
@@ -88,8 +89,8 @@ public class RegistroServicioAutor {
             ServiceOptions opcionesServicio = new ServiceOptions()
                     .setId(idServicio)
                     .setName("app-autores")
-                    //.setAddress(InetAddress.getLocalHost().getHostAddress())
-                    .setAddress(httpHost)  // TODO Cambié de direccionIp a localhost, para que funcione.
+                    .setAddress(InetAddress.getLocalHost().getHostAddress())
+                    //.setAddress(httpHost)  // TODO: Sin contenedores, usar localhost.
                     .setPort(httpPort)
                     .setTags(etiquetas)
                     .setCheckOptions(opcionesVerificacion);

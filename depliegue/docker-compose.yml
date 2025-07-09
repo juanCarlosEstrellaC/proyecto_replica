@@ -7,8 +7,9 @@
 # Acceder al dashboard de Traefik: http://localhost:8888
 # Acceder a Consul: http://localhost:8500
 # Acceder a la aplicación de autores: http://localhost:8080/app-autores/autores
+# Acceder a la aplicación de libros: http://localhost:8080/app-libros/libros
 
-# En la configuración de importación de fuentes de Grafana, para prometheus, la URL es: http://prometheus:9090
+# En la configuración de importación de fuentes de Grafana, para prometheus, la URL es: http://prometheus_metricas:9090
 
 services:
   base_de_datos:
@@ -21,7 +22,7 @@ services:
     volumes:
       - "c:/db-libreria:/var/lib/postgresql/data"
     ports:
-      - "54321:5432"
+      - "5432:5432" # TODO: cambiar de "54321:5432".
     expose:
       - 5432
     # expose en docker-compose.yml hace que el puerto sea accesible para otros servicios del mismo Compose, pero no para
@@ -71,7 +72,8 @@ services:
       - consul
 
   autores:
-    image: jcestrella/app-autores:latest
+    #image: jcestrella/app-autores:latest
+    image: jcestrella/app-autores:v_ip_real
     environment:
       QUARKUS_DATASOURCE_USERNAME: postgres
       QUARKUS_DATASOURCE_PASSWORD: labcom,2015
@@ -82,7 +84,7 @@ services:
     expose:
       - 8080
     deploy:
-      replicas: 4
+      replicas: 1
     depends_on:
       - base_de_datos
       - consul
@@ -93,8 +95,11 @@ services:
       chmod +x /usr/local/bin/wait-for-it &&
       /usr/local/bin/wait-for-it base_de_datos:5432 -- java -jar /app/app.jar
       "
+
+
   libros:
-    image: jcestrella/app-libros:latest
+    #image: jcestrella/app-libros:latest
+    image: jcestrella/app-libros:v_ip_real
     environment:
       QUARKUS_DATASOURCE_USERNAME: postgres
       QUARKUS_DATASOURCE_PASSWORD: labcom,2015
@@ -115,6 +120,7 @@ services:
       chmod +x /usr/local/bin/wait-for-it &&
       /usr/local/bin/wait-for-it base_de_datos:5432 -- java -jar /app/app.jar
       "
+
 
   prometheus_metricas:
     image: prom/prometheus:latest

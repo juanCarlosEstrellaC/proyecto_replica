@@ -20,7 +20,7 @@ import java.util.UUID;
  * Ciclo de vida del servicio de Libros
  * Registra el servicio en Consul al iniciar la aplicación y lo elimina al detenerla.
  * Este ciclo de vida es necesario para que Traefik pueda enrutar las peticiones al servicio de Libros.
- * <p>
+ *
  * Consul es un servicio que registra, descubre y monitorea la salud de los servicios en tu red.
  * Traefik es un proxy inverso y balanceador de carga (a nivel de red) que dirige automáticamente el tráfico al servicio
  * correcto según reglas y descubrimiento.
@@ -31,7 +31,7 @@ public class RegistroServicioLibro {
 
     // Inyección de propiedades de configuración
     @Inject
-    @ConfigProperty(name = "quarkus.http.port", defaultValue = "9090")
+@ConfigProperty(name = "quarkus.http.port", defaultValue = "8080") // TODO: cambie del 9090. Ese solo para modo dev.
     Integer httpPort;
 
     @Inject
@@ -79,9 +79,10 @@ public class RegistroServicioLibro {
             System.out.println("Puerto HTTP del servicio: " + httpPort);
             System.out.println("Host HTTP del servicio: " + httpHost);
             var opcionesVerificacion = new CheckOptions()
+                    // TODO: Para contenedores se usa la IP del contenedor. Usar localhost sin contenedores.
                     //.setHttp("http://127.0.0.1:8080/ping")
-                    //.setHttp(String.format("http://%s:%s/ping", direccionIp.getHostAddress(), httpPort))
-                    .setHttp(String.format("http://%s:%s/ping", httpHost, httpPort)) // TODO cambie de direccionIp a localhost, para que funcione.
+                    //.setHttp(String.format("http://%s:%s/ping", httpHost, httpPort)) // TODO: Sin contenedores, usar localhost.
+                    .setHttp(String.format("http://%s:%s/ping", direccionIp.getHostAddress(), httpPort))
                     .setInterval("10s")
                     .setDeregisterAfter("20s");
 
@@ -89,8 +90,8 @@ public class RegistroServicioLibro {
             ServiceOptions opcionesServicio = new ServiceOptions()
                     .setId(idServicio)
                     .setName("app-libros")
-                    //.setAddress(InetAddress.getLocalHost().getHostAddress())
-                    .setAddress(httpHost) // TODO Cambié de direccionIp a localhost, para que funcione.
+                    .setAddress(InetAddress.getLocalHost().getHostAddress())
+                    //.setAddress(httpHost) // TODO: Sin contenedores, usar localhost.
                     .setPort(httpPort)
                     .setTags(etiquetas)
                     .setCheckOptions(opcionesVerificacion);
