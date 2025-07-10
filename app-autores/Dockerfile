@@ -20,9 +20,7 @@ CMD ["java", "-jar", "app.jar"]
 ############################ Comandos para construir la imagen Docker ##############################
 #  1. Navegar al directorio donde se encuentra este Dockerfile.
 #  2. Ejecutar el comando:
-#       docker build -t jcestrella/app-autores .  (OJO, colocar el punto al final)
-#       docker build -t jcestrella/app-autores:v_ip_real .
+#       docker build -t jcestrella/app-autores:v1.0.0 .  (OJO, colocar el punto al final)
 #
 #  3. Para subir la imagen a Docker Hub, usar:
-#       docker push jcestrella/app-autores
-#       docker push jcestrella/app-autores:v_ip_real
+#       docker push jcestrella/app-autores:v1.0.0

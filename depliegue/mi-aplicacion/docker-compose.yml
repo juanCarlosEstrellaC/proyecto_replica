@@ -31,9 +31,10 @@ services:
   metricas_base_datos:
     image: prometheuscommunity/postgres-exporter
     environment:
-      DATA_SOURCE_NAME: "base_de_datos:5432/db_libreria?sslmode=disable"
-      DATA_SOURCE_USER: "postgres"
-      DATA_SOURCE_PASSWORD: "labcom,2015"
+      #DATA_SOURCE_NAME: "base_de_datos:5432/db_libreria?sslmode=disable"
+      #DATA_SOURCE_USER: "postgres"
+      #DATA_SOURCE_PASSWORD: "labcom,2015"
+      DATA_SOURCE_NAME: "postgresql://postgres:labcom%2C2015@base_de_datos:5432/db_libreria?sslmode=disable"
     expose:
       - 9187
 
@@ -72,8 +73,7 @@ services:
       - consul
 
   autores:
-    #image: jcestrella/app-autores:latest
-    image: jcestrella/app-autores:v_ip_real
+    image: jcestrella/app-autores:v1.0.0
     environment:
       QUARKUS_DATASOURCE_USERNAME: postgres
       QUARKUS_DATASOURCE_PASSWORD: labcom,2015
@@ -88,6 +88,13 @@ services:
     depends_on:
       - base_de_datos
       - consul
+    # entrypoint: >
+    # sh -c "
+    # apk add --no-cache curl bash &&
+    # curl -o /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh &&
+    # chmod +x /usr/local/bin/wait-for-it &&
+    # /usr/local/bin/wait-for-it base_de_datos:5432 -- java -jar /app/app.jar
+    # "
     entrypoint: >
       sh -c "
       apk add --no-cache curl bash &&
@@ -98,8 +105,7 @@ services:
 
 
   libros:
-    #image: jcestrella/app-libros:latest
-    image: jcestrella/app-libros:v_ip_real
+    image: jcestrella/app-libros:v1.0.0
     environment:
       QUARKUS_DATASOURCE_USERNAME: postgres
       QUARKUS_DATASOURCE_PASSWORD: labcom,2015
@@ -114,12 +120,18 @@ services:
     depends_on:
       - base_de_datos
       - consul
+    # entrypoint: >
+    # sh -c "
+    # curl -o /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh &&
+    # chmod +x /usr/local/bin/wait-for-it &&
+    # /usr/local/bin/wait-for-it base_de_datos:5432 -- java -jar /app/app.jar
+    # "
     entrypoint: >
-      sh -c "
-      curl -o /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh &&
-      chmod +x /usr/local/bin/wait-for-it &&
-      /usr/local/bin/wait-for-it base_de_datos:5432 -- java -jar /app/app.jar
-      "
+          sh -c "
+          curl -o /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh &&
+          chmod +x /usr/local/bin/wait-for-it &&
+          /usr/local/bin/wait-for-it base_de_datos:5432 -- java -jar /app/app.jar
+          "
 
 
   prometheus_metricas:
