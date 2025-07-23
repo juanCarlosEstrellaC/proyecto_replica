@@ -48,7 +48,7 @@ public class AutorRest {
     @Path("/libro/{isbn}")
     public Response buscarPorLibro(@PathParam("isbn") String isbn) {
 
-        simularErrores();
+        //simularErrores();
 
         var autores = autorRepository.buscarPorLibro(isbn);
         var autoresYPuerto = listaAutoresYPuerto(autores);

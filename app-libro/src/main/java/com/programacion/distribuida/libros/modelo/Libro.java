@@ -28,4 +28,5 @@ public class Libro {
 
     @OneToOne(mappedBy = "libro")
     private Inventario inventario;
+    
 }

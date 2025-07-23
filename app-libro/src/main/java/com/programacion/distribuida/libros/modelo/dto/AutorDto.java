@@ -12,12 +12,4 @@ public class AutorDto {
     private Integer id;
     private String nombre;
 
-    public AutorDto() {
-    }
-
-    public AutorDto(Integer id, String nombre, Integer version) {
-        this.id = id;
-        this.nombre = nombre;
-    }
-
 }

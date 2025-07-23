@@ -1,0 +1,40 @@
+
+# Obtener libro por ISBN
+GET http://localhost:9090/libros/100
+Accept: application/json
+
+###
+# Obtener todos los libros
+GET http://localhost:9090/libros
+Accept: application/json
+
+###
+# Crear un libro
+POST http://localhost:9090/libros
+Content-Type: application/json
+Accept: application/json
+
+{
+  "isbn": "1234567890",
+  "titulo": "Ejemplo de Libro",
+  "anio": 2025,
+  "editorial": "Editorial Ejemplo"
+}
+
+###
+# Actualizar un libro
+PUT http://localhost:9090/libros/1234567890
+Content-Type: application/json
+Accept: application/json
+
+{
+  "isbn": "1234567890",
+  "titulo": "Libro Actualizado",
+  "anio": 2026,
+  "editorial": "Editorial Actualizada"
+}
+
+###
+# Eliminar un libro
+DELETE http://localhost:9090/libros/1234567890
+Accept: application/json

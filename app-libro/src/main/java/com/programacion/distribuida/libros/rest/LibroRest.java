@@ -51,6 +51,41 @@ public class LibroRest {
         return Response.ok(librosDto).build();
     }
 
+    @POST
+    public Response guardar(Libro libro) {
+        if (libro == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        libroRepository.persist(libro);
+        return Response.status(Response.Status.CREATED).entity(libro).build();
+    }
+
+    @PUT
+    @Path("/{isbn}")
+    public Response actualizar(@PathParam("isbn") String isbn, Libro libro) {
+        if (libro == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        var libroExistente = libroRepository.findByIdOptional(isbn);
+        if (libroExistente.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        libro.setIsbn(isbn);
+        libroRepository.getEntityManager().merge(libro);
+        return Response.ok(libro).build();
+    }
+
+    @DELETE
+    @Path("/{isbn}")
+    public Response eliminar(@PathParam("isbn") String isbn) {
+        var libroExistente = libroRepository.findByIdOptional(isbn);
+        if (libroExistente.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        libroRepository.delete(libroExistente.get());
+        return Response.noContent().build();
+    }
+
     private LibroDto convertirALibroDto(Libro libro) {
         var libroDto = new LibroDto();
         modelMapper.map(libro, libroDto);
