@@ -1,0 +1,35 @@
+### Obtener autor por ID
+GET http://localhost:8080/autores/1
+Accept: application/json
+
+### Listar todos los autores
+GET http://localhost:8080/autores
+Accept: application/json
+
+### Buscar autores por libro (ISBN)
+GET http://localhost:8080/autores/libro/100
+Accept: application/json
+
+### Crear un nuevo autor
+POST http://localhost:8080/autores
+Content-Type: application/json
+Accept: application/json
+
+  {
+    "nombre": "Julio Cortázar",
+    "version": 2
+  },
+
+### Actualizar un autor existente
+PUT http://localhost:8080/autores/4
+Content-Type: application/json
+Accept: application/json
+
+  {
+    "nombre": "Julio Andrés Cortázar",
+    "version": 3
+  },
+
+### Eliminar un autor
+DELETE http://localhost:8080/autores/4
+Accept: application/json
