@@ -1,6 +1,5 @@
 package com.programacion.distribuida.libros.modelo;
 
-import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

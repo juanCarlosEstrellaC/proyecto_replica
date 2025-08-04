@@ -15,10 +15,9 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "isbn": "1234567890",
-  "titulo": "Ejemplo de Libro",
-  "anio": 2025,
-  "editorial": "Editorial Ejemplo"
+  "isbn": "104",
+  "precio": 9.50,
+  "titulo": "Infinix"
 }
 
 ###
@@ -29,9 +28,8 @@ Accept: application/json
 
 {
   "isbn": "1234567890",
-  "titulo": "Libro Actualizado",
-  "anio": 2026,
-  "editorial": "Editorial Actualizada"
+  "precio": 1.50,
+  "titulo": "Libro Actualizado"
 }
 
 ###

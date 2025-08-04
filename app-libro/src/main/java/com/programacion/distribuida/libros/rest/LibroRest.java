@@ -6,6 +6,7 @@ import com.programacion.distribuida.libros.modelo.dto.LibroDto;
 import com.programacion.distribuida.libros.repository.LibroRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -62,6 +63,7 @@ public class LibroRest {
 
     @PUT
     @Path("/{isbn}")
+    @Transactional
     public Response actualizar(@PathParam("isbn") String isbn, Libro libro) {
         if (libro == null) {
             return Response.status(Response.Status.BAD_REQUEST).build();

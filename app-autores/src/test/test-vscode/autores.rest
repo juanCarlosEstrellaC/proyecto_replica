@@ -21,7 +21,7 @@ Accept: application/json
   },
 
 ### Actualizar un autor existente
-PUT http://localhost:8080/autores/4
+PUT http://localhost:8080/autores/5
 Content-Type: application/json
 Accept: application/json
 
@@ -31,5 +31,5 @@ Accept: application/json
   },
 
 ### Eliminar un autor
-DELETE http://localhost:8080/autores/4
+DELETE http://localhost:8080/autores/5
 Accept: application/json
