@@ -7,6 +7,4 @@ import jakarta.transaction.Transactional;
 
 @ApplicationScoped
 @Transactional
-public class LibroRepository implements PanacheRepositoryBase<Libro, String> {
-
-}
+public class LibroRepository implements PanacheRepositoryBase<Libro, String> {}

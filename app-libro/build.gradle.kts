@@ -27,6 +27,7 @@ dependencies {
     // REST
     implementation("io.quarkus:quarkus-rest")
     implementation("io.quarkus:quarkus-rest-jsonb")
+    
     // Rest Client: para consumir servicios REST
     implementation("io.quarkus:quarkus-rest-client")
     implementation("io.quarkus:quarkus-rest-client-jsonb")
@@ -48,7 +49,6 @@ dependencies {
 
     // Telemetria: metricas
     implementation("io.quarkus:quarkus-micrometer-registry-prometheus")
-    implementation("io.quarkus:quarkus-jackson")
 }
 
 tasks.withType<JavaCompile> {

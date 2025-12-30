@@ -61,7 +61,50 @@ public class RegistroServicioAutor {
             // Generar un ID único para el servicio
             idServicio = UUID.randomUUID().toString();
 
-            // Definir las etiquetas del servicio para que Traefik pueda enrutar las peticiones.
+            /**  Definir las etiquetas del servicio para que Traefik pueda enrutar las peticiones.
+             * A la URL normal de mi servicio le agrego un prefijo (algo que va antes de..., en este caso, la URL normal) 
+             * para que Traefik pueda enrutar las peticiones.
+             * Normalmente la URL (interna) de mi servicio es:
+             *                  http://localhost:8080/autores, 
+             * 
+             * pero con el prefijo se convierte en la URL publica (la que se muestra en el navegador):
+             *                  http://localhost:8080/mi-prefijo-para-app-autores/autores.
+             * 
+             * Para la arquitectura de microservicios, configuro prefijos para que Traefik sepa a qué microservicio
+             * debe enrutar las peticiones. Luego de enrutar las peticiones, se quita el prefijo para que el microservicio
+             * pueda manejar la petición correctamente.
+             * 
+             * En la configuración dinámica de Traefik, se define un archivo YAML con la siguiente configuración:
+
+                http:
+                    routers:
+                        mi-enrutador-app-autores:
+                            entryPoints:
+                                - http
+                            rule: PathPrefix(`/mi-prefijo-para-app-autores`)  # Si la URL empieza con esto...
+                            service: mi-servicio-app-autores             # ...mándalo a este servicio
+                            middlewares:
+                                - quitar-prefijo-app-autores             # ...pero antes quítale el prefijo
+
+                    services:
+                        mi-servicio-app-autores:
+                            loadBalancer:
+                                servers:
+                                    - url: "http://127.0.0.1:8080" # Instancia 1
+                                    - url: "http://127.0.0.1:8081" # Instancia 2 (Balanceo de carga)
+
+                    middlewares:
+                        quitar-prefijo-app-autores:
+                            stripPrefix:
+                                prefixes:
+                                    - "/mi-prefijo-app-autores"
+            
+
+            * Pero, en este caso, al usar Consul, le paso esta información en este formato plano sin indentación, 
+            * y omitiendo los datos del services, ya que los especifico más adelante la opciones de ServiceOptions, 
+            * en el apartado de setAddress y setPort.
+                
+            */
             var etiquetas = List.of(
                     "traefik.enable=true",
                     "traefik.http.routers.app-autores.rule=PathPrefix(`/app-autores`)",
@@ -90,7 +133,7 @@ public class RegistroServicioAutor {
                     .setId(idServicio)
                     .setName("app-autores")
                     //.setAddress(InetAddress.getLocalHost().getHostAddress())
-                    .setAddress(httpHost)  // TODO: Sin contenedores, usar localhost.
+                    .setAddress(httpHost)  //TODO: Sin contenedores, usar localhost.
                     .setPort(httpPort)
                     .setTags(etiquetas)
                     .setCheckOptions(opcionesVerificacion);
