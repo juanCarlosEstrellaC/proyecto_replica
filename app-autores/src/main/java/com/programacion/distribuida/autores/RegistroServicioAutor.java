@@ -50,7 +50,7 @@ public class RegistroServicioAutor {
 
     // Metodo para registrar el servicio en Consul al iniciar la aplicación. Se ejecuta al inicio de la aplicación
     // automáticamente gracias a la anotación @Observes en el evento StartupEvent.
-    void registrarServicioEnConsul(@Observes StartupEvent eventoInicioApp, Vertx vertx){ // TODO quité el throws Exception, revisar si es necesario
+    void registrarServicioEnConsul(@Observes StartupEvent eventoInicioApp, Vertx vertx){ 
         try {
             System.out.println("Iniciando servicio de Autores...");
             ConsulClientOptions opciones = new ConsulClientOptions()
@@ -61,14 +61,14 @@ public class RegistroServicioAutor {
             // Generar un ID único para el servicio
             idServicio = UUID.randomUUID().toString();
 
-            /**  Definir las etiquetas del servicio para que Traefik pueda enrutar las peticiones.
+            /** Definir las etiquetas del servicio para que Traefik pueda enrutar las peticiones.
              * A la URL normal de mi servicio le agrego un prefijo (algo que va antes de..., en este caso, la URL normal) 
              * para que Traefik pueda enrutar las peticiones.
              * Normalmente la URL (interna) de mi servicio es:
              *                  http://localhost:8080/autores, 
              * 
              * pero con el prefijo se convierte en la URL publica (la que se muestra en el navegador):
-             *                  http://localhost:8080/mi-prefijo-para-app-autores/autores.
+             *                  http://localhost:8080/mi-app-autores/autores.
              * 
              * Para la arquitectura de microservicios, configuro prefijos para que Traefik sepa a qué microservicio
              * debe enrutar las peticiones. Luego de enrutar las peticiones, se quita el prefijo para que el microservicio
@@ -81,10 +81,10 @@ public class RegistroServicioAutor {
                         mi-enrutador-app-autores:
                             entryPoints:
                                 - http
-                            rule: PathPrefix(`/mi-prefijo-para-app-autores`)  # Si la URL empieza con esto...
-                            service: mi-servicio-app-autores             # ...mándalo a este servicio
+                            rule: PathPrefix(`/mi-app-autores`)               # Si la URL empieza con esto...
+                            service: mi-servicio-app-autores                  # ...mándalo a este servicio
                             middlewares:
-                                - quitar-prefijo-app-autores             # ...pero antes quítale el prefijo
+                                - quitar-prefijo-app-autores                  # ...pero antes quítale el prefijo
 
                     services:
                         mi-servicio-app-autores:
@@ -97,7 +97,7 @@ public class RegistroServicioAutor {
                         quitar-prefijo-app-autores:
                             stripPrefix:
                                 prefixes:
-                                    - "/mi-prefijo-app-autores"
+                                    - "/mi-app-autores"
             
 
             * Pero, en este caso, al usar Consul, le paso esta información en este formato plano sin indentación, 
@@ -107,15 +107,16 @@ public class RegistroServicioAutor {
             */
             var etiquetas = List.of(
                     "traefik.enable=true",
-                    "traefik.http.routers.app-autores.rule=PathPrefix(`/app-autores`)",
-                    "traefik.http.routers.app-autores.middlewares=strip-prefix-autores",
-                    "traefik.http.middlewares.strip-prefix-autores.stripPrefix.prefixes=/app-autores"
+                    "traefik.http.routers.mi-enrutador-app-autores.rule=PathPrefix(`/mi-app-autores`)",
+                    "traefik.http.routers.mi-enrutador-app-autores.middlewares=quitar-prefijo-app-autores",
+                    "traefik.http.middlewares.quitar-prefijo-app-autores.stripPrefix.prefixes=/mi-app-autores"
             );
 
             /* Configurar las opciones de verificación del servicio (healthcheck de Consul). Verifica que el servicio
                esté activo y respondiendo. La verificación se realiza enviando una petición HTTP al endpoint /ping del
                servicio. Si el servicio no responde, Consul lo considerará inactivo y lo eliminará de su registro
                después de 20 segundos. */
+            
             var direccionIp = InetAddress.getLocalHost();
             System.out.println("Direccion ip:" + direccionIp.getHostAddress());
             System.out.println("Puerto HTTP del servicio: " + httpPort);
@@ -131,7 +132,7 @@ public class RegistroServicioAutor {
             // Registrar el servicio en Consul
             ServiceOptions opcionesServicio = new ServiceOptions()
                     .setId(idServicio)
-                    .setName("app-autores")
+                    .setName("app-autores") // Nombre del servicio para identificarlo en Consul. Puede ser cualquier nombre.
                     //.setAddress(InetAddress.getLocalHost().getHostAddress())
                     .setAddress(httpHost)  //TODO: Sin contenedores, usar localhost.
                     .setPort(httpPort)
