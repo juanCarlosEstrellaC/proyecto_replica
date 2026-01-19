@@ -31,7 +31,7 @@ public class RegistroServicioLibro {
 
     // Inyección de propiedades de configuración
     @Inject
-@ConfigProperty(name = "quarkus.http.port", defaultValue = "8080") // TODO: cambie del 9090. Ese solo para modo dev.
+    @ConfigProperty(name = "quarkus.http.port", defaultValue = "8080") // TODO: cambie del 9090. Ese solo para modo dev.
     Integer httpPort;
 
     @Inject
@@ -65,9 +65,9 @@ public class RegistroServicioLibro {
             // Definir las etiquetas del servicio para que Traefik pueda enrutar las peticiones.
             var etiquetas = List.of(
                     "traefik.enable=true",
-                    "traefik.http.routers.app-libros.rule=PathPrefix(`/app-libros`)",
-                    "traefik.http.routers.app-libros.middlewares=strip-prefix-libros",
-                    "traefik.http.middlewares.strip-prefix-libros.stripPrefix.prefixes=/app-libros"
+                    "traefik.http.routers.mi-enrutador-app-libros.rule=PathPrefix(`/mi-app-libros`)",
+                    "traefik.http.routers.mi-enrutador-app-libros.middlewares=strip-prefix-libros",
+                    "traefik.http.middlewares.strip-prefix-libros.stripPrefix.prefixes=/mi-app-libros"
             );
 
             /* Configurar las opciones de verificación del servicio (healthcheck de Consul). Verifica que el servicio
