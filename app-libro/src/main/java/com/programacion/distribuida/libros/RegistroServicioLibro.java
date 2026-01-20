@@ -20,9 +20,8 @@ import java.util.UUID;
  * Ciclo de vida del servicio de Libros
  * Registra el servicio en Consul al iniciar la aplicación y lo elimina al detenerla.
  * Este ciclo de vida es necesario para que Traefik pueda enrutar las peticiones al servicio de Libros.
- *
  * Consul es un servicio que registra, descubre y monitorea la salud de los servicios en tu red.
- * Traefik es un proxy inverso y balanceador de carga (a nivel de red) que dirige automáticamente el tráfico al servicio
+ * Traefik es un proxy inverso y balanceador de carga (a nivel de red) que dirige automáticamente el tráfico al servicio 
  * correcto según reglas y descubrimiento.
  */
 
@@ -51,7 +50,7 @@ public class RegistroServicioLibro {
 
     // Metodo para registrar el servicio en Consul al iniciar la aplicación. Se ejecuta al inicio de la aplicación
     // automáticamente gracias a la anotación @Observes en el evento StartupEvent.
-    void registrarServicioEnConsul(@Observes StartupEvent eventoInicioApp, Vertx vertx) { // TODO quité el throws Exception, revisar si es necesario
+    void registrarServicioEnConsul(@Observes StartupEvent eventoInicioApp, Vertx vertx) {
         try {
             System.out.println("Iniciando servicio de Libros...");
             ConsulClientOptions opciones = new ConsulClientOptions()
@@ -62,27 +61,33 @@ public class RegistroServicioLibro {
             // Generar un ID único para el servicio
             idServicio = UUID.randomUUID().toString();
 
-            // Definir las etiquetas del servicio para que Traefik pueda enrutar las peticiones.
+            // Definir las etiquetas del servicio para que Traefik pueda enrutar las
+            // peticiones.
             var etiquetas = List.of(
                     "traefik.enable=true",
                     "traefik.http.routers.mi-enrutador-app-libros.rule=PathPrefix(`/mi-app-libros`)",
                     "traefik.http.routers.mi-enrutador-app-libros.middlewares=strip-prefix-libros",
-                    "traefik.http.middlewares.strip-prefix-libros.stripPrefix.prefixes=/mi-app-libros"
-            );
+                    "traefik.http.middlewares.strip-prefix-libros.stripPrefix.prefixes=/mi-app-libros");
 
-            /* Configurar las opciones de verificación del servicio (healthcheck de Consul). Verifica que el servicio
-               esté activo y respondiendo. La verificación se realiza enviando una petición HTTP al endpoint /ping del
-               servicio. Si el servicio no responde, Consul lo considerará inactivo y lo eliminará de su registro
-               después de 20 segundos. */
+            /*
+             * Configurar las opciones de verificación del servicio (healthcheck de Consul).
+             * Verifica que el servicio esté activo y respondiendo. La verificación se realiza enviando una petición
+             * HTTP al endpoint /ping del servicio. Si el servicio no responde, Consul lo considerará inactivo y lo
+             * eliminará de su registro después de 20 segundos.
+             */
             var direccionIp = InetAddress.getLocalHost();
             System.out.println("Direccion ip:" + direccionIp.getHostAddress());
             System.out.println("Puerto HTTP del servicio: " + httpPort);
             System.out.println("Host HTTP del servicio: " + httpHost);
+
+            String hostParaConsul = "0.0.0.0".equals(httpHost) 
+                    ? direccionIp.getHostAddress() 
+                    : httpHost;
+            System.out.println("Host reportado a Consul: " + hostParaConsul);
+
             var opcionesVerificacion = new CheckOptions()
-                    // TODO: Para contenedores se usa la IP del contenedor. Usar localhost sin contenedores.
-                    //.setHttp("http://127.0.0.1:8080/ping")
-                    .setHttp(String.format("http://%s:%s/ping", httpHost, httpPort)) // TODO: Sin contenedores, usar localhost.
-                    //.setHttp(String.format("http://%s:%s/ping", direccionIp.getHostAddress(), httpPort))
+                    //Buscamos http://127.0.0.1:8080/ping, pero con la IP para Consul.
+                    .setHttp(String.format("http://%s:%s/ping", hostParaConsul, httpPort)) 
                     .setInterval("10s")
                     .setDeregisterAfter("20s");
 
@@ -90,8 +95,7 @@ public class RegistroServicioLibro {
             ServiceOptions opcionesServicio = new ServiceOptions()
                     .setId(idServicio)
                     .setName("app-libros")
-                    //.setAddress(InetAddress.getLocalHost().getHostAddress())
-                    .setAddress(httpHost) // TODO: Sin contenedores, usar localhost.
+                    .setAddress(hostParaConsul)
                     .setPort(httpPort)
                     .setTags(etiquetas)
                     .setCheckOptions(opcionesVerificacion);
@@ -103,7 +107,8 @@ public class RegistroServicioLibro {
         }
     }
 
-    // Metodo para eliminar el servicio de Consul al detener la aplicación. Se ejecuta al finalizar la aplicación
+    // Metodo para eliminar el servicio de Consul al detener la aplicación. Se
+    // ejecuta al finalizar la aplicación
     // automáticamente gracias a la anotación @Observes en el evento ShutdownEvent.
     void eliminarServicioDeConsul(@Observes ShutdownEvent eventoFinApp, Vertx vertx) {
         try {

@@ -7,6 +7,9 @@ ENV LANGUAGE='en_US:en'
 RUN mkdir /app
 WORKDIR /app
 
+# Instalar dependencias necesarias (curl para healthcheck, bash para scripts)
+RUN apk add --no-cache curl bash
+
 # Copiar los archivos de la aplicacion al contenedor.
 COPY build/quarkus-app/lib/ ./lib
 COPY build/quarkus-app/quarkus ./quarkus
@@ -20,7 +23,7 @@ CMD ["java", "-jar", "app.jar"]
 ############################ Comandos para construir la imagen Docker ##############################
 #  1. Navegar al directorio donde se encuentra este Dockerfile.
 #  2. Ejecutar el comando:
-#       docker build -t jcestrella/app-autores:v1.0.0 ./
+#       docker build -t jcestrella/app-autores:v1.2.1 ./
 #
 #  3. Para subir la imagen a Docker Hub, usar:
-#       docker push jcestrella/app-autores:v1.0.0
+#       docker push jcestrella/app-autores:v1.2.1

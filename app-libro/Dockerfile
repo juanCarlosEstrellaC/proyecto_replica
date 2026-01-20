@@ -7,9 +7,10 @@ ENV LANGUAGE='en_US:en'
 RUN mkdir /app
 WORKDIR /app
 
-# Instalar utilidades necesarias, como ping, para verificar la conectividad de red.
+# Instalar utilidades necesarias, como ping, para verificar la conectividad de red y curl para hacer 
+# peticiones HTTP.
 RUN apt update
-RUN apt install -y iputils-ping
+RUN apt install -y iputils-ping curl
 
 # Copiar los archivos de la aplicacion al contenedor.
 COPY build/quarkus-app/lib/ ./lib
@@ -24,7 +25,7 @@ CMD ["java", "-jar", "app.jar"]
 ############################ Comandos para construir la imagen Docker ##############################
 #  1. Navegar al directorio donde se encuentra este Dockerfile.
 #  2. Ejecutar el comando:
-#       docker build -t jcestrella/app-libros:v1.0.0 ./  
+#       docker build -t jcestrella/app-libros:v1.2.1 ./  
 #
 #  3. Para subir la imagen a Docker Hub, usar:
-#       docker push jcestrella/app-libros:v1.0.0
+#       docker push jcestrella/app-libros:v1.2.1

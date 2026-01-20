@@ -23,7 +23,7 @@ import java.util.UUID;
  * Consul es un servicio que registra, descubre y monitorea la salud de los servicios en tu red.
  * Traefik es un proxy inverso y balanceador de carga (a nivel de red) que dirige automáticamente el tráfico al servicio
  * correcto según reglas y descubrimiento.
-*/
+ */
 
 @ApplicationScoped
 public class RegistroServicioAutor {
@@ -102,30 +102,53 @@ public class RegistroServicioAutor {
 
             * Pero, en este caso, al usar Consul, le paso esta información en este formato plano sin indentación, 
             * y omitiendo los datos del services, ya que los especifico más adelante la opciones de ServiceOptions, 
-            * en el apartado de setAddress y setPort.
+             * en el apartado de setAddress y setPort.
                 
-            */
+             */
             var etiquetas = List.of(
                     "traefik.enable=true",
                     "traefik.http.routers.mi-enrutador-app-autores.rule=PathPrefix(`/mi-app-autores`)",
                     "traefik.http.routers.mi-enrutador-app-autores.middlewares=quitar-prefijo-app-autores",
-                    "traefik.http.middlewares.quitar-prefijo-app-autores.stripPrefix.prefixes=/mi-app-autores"
-            );
+                    "traefik.http.middlewares.quitar-prefijo-app-autores.stripPrefix.prefixes=/mi-app-autores");
 
             /* Configurar las opciones de verificación del servicio (healthcheck de Consul). Verifica que el servicio
                esté activo y respondiendo. La verificación se realiza enviando una petición HTTP al endpoint /ping del
                servicio. Si el servicio no responde, Consul lo considerará inactivo y lo eliminará de su registro
                después de 20 segundos. */
-            
             var direccionIp = InetAddress.getLocalHost();
-            System.out.println("Direccion ip:" + direccionIp.getHostAddress());
+            System.out.println("Direccion IP del servicio: " + direccionIp.getHostAddress());
             System.out.println("Puerto HTTP del servicio: " + httpPort);
-            System.out.println("Host HTTP del servicio: " + httpHost);
+            System.out.println("IP donde el servicio escucha conexiones: " + httpHost);
+
+            /*  Host para Consul:
+                Se debe aclarar que la configuración quarkus.http.host no define dónde se almacena el servicio, o algo parecido,
+                sino que define la Interfaz de Red donde el servicio escucha conexiones, es decir que define la IP o las IPs 
+                donde el servicio escucha conexiones. 
+                Si la configuracion dice "0.0.0.0", significa que el servicio escucha conexiones en todas las interfaces de red (puede 
+                ser "0.0.0.0", "localhost", "127.0.0.1", "192.168.1.1", etc.
+                Si la configuracion dice "localhost", significa que el servicio escucha conexiones unicamente de la misma maquina.
+
+                En este caso, si la configuracion dice "0.0.0.0" (Señal de que estamos en Docker, ie, la IP es dinámica y no solo va a 
+                recibir peticiones de la misma maquina como lo haría en localhost), entonces se debe obtener la IP real del host (la IP
+                del contenedor).
+                Si dice cualquier otra cosa (ej: "localhost"), se mantiene la configuración original, ie, localhost.
+                
+                Además, no es lo mismo que la IP donde el servicio escucha conexiones (httpHost) que la IP donde el servicio se almacena
+                en Consul (hostParaConsul), ya que el hostParaConsul es la IP real del host (la IP del contenedor), donde va ser reportado 
+                el servicio cuando quiera ser descubierto por otros servicios.
+
+                Entonces, cuando esté esperando que cualquier otro contenedor se conecte con el servicio, el http.host será 0.0.0.0, y la 
+                IP para Consul será algo como 172.17.0.2 (IP que proporciona Docker). En cambio, si la configuracion dice "localhost", 
+                entonces el http.host será localhost, y la IP para Consul será 127.0.0.1.   
+                */
+            String hostParaConsul = "0.0.0.0".equals(httpHost) 
+                    ? direccionIp.getHostAddress() 
+                    : httpHost;
+            System.out.println("Host reportado a Consul: " + hostParaConsul);
+
             var opcionesVerificacion = new CheckOptions()
-                    // TODO: Para contenedores se usa la IP del contenedor. Usar localhost sin contenedores.
-                    //.setHttp("http://127.0.0.1:8080/ping")
-                    .setHttp(String.format("http://%s:%s/ping", httpHost, httpPort)) // TODO: Sin contenedores, usar localhost.
-                    //.setHttp(String.format("http://%s:%s/ping", direccionIp.getHostAddress(), httpPort))
+                    //Buscamos http://127.0.0.1:8080/ping, pero con la IP para Consul.
+                    .setHttp(String.format("http://%s:%s/ping", hostParaConsul, httpPort)) 
                     .setInterval("10s")
                     .setDeregisterAfter("20s");
 
@@ -133,8 +156,7 @@ public class RegistroServicioAutor {
             ServiceOptions opcionesServicio = new ServiceOptions()
                     .setId(idServicio)
                     .setName("app-autores") // Nombre del servicio para identificarlo en Consul. Puede ser cualquier nombre.
-                    //.setAddress(InetAddress.getLocalHost().getHostAddress())
-                    .setAddress(httpHost)  //TODO: Sin contenedores, usar localhost.
+                    .setAddress(hostParaConsul)
                     .setPort(httpPort)
                     .setTags(etiquetas)
                     .setCheckOptions(opcionesVerificacion);
