@@ -9,7 +9,10 @@
 # Acceder a la aplicación de autores: http://localhost:8080/mi-app-autores/autores
 # Acceder a la aplicación de libros: http://localhost:8080/mi-app-libros/libros
 
-# En la configuración de importación de fuentes de Grafana, para prometheus, la URL es: http://prometheus_metricas:9090
+# Dentro de la red de Docker, el nombre de un servicio es el que se usa para acceder a él mediante la URL.
+# Por ejemplo, en el servicio autores, se usa la URL http://autores:8080/mi-app-autores/autores.
+# En el servicio libros, se usa la URL http://libros:8080/mi-app-libros/libros. 
+# Por esa razón, en la configuración de fuentes de Grafana, para prometheus, la URL es: http://prometheus_metricas:9090
 
 services:
   base_de_datos:
@@ -90,7 +93,7 @@ services:
     expose:
       - 8080
     deploy:
-      replicas: 1
+      replicas: 5
     depends_on:
       base_de_datos:
         condition: service_healthy
@@ -111,7 +114,7 @@ services:
     expose:
       - 8080
     deploy:
-      replicas: 1
+      replicas: 13
     depends_on:
       base_de_datos:
         condition: service_healthy
