@@ -16,14 +16,14 @@ spec:
     spec:
       containers:
         - name: app-autores
-          image: jcestrella/app-autores:v_ip_real
+          image: jcestrella/app-autores:v1.2.1
           env:
             - name: QUARKUS_DATASOURCE_USERNAME
               value: postgres
             - name: QUARKUS_DATASOURCE_PASSWORD
               value: labcom,2015
             - name: QUARKUS_DATASOURCE_JDBC_URL
-              value: jdbc:postgresql://base_de_datos:5432/db_libreria
+              value: jdbc:postgresql://base-de-datos:5432/db_libreria
             - name: QUARKUS_HTTP_PORT
               value: "8080"
             - name: CONSUL_HOST
@@ -36,11 +36,18 @@ spec:
             requests:
               memory: "512Mi"
               cpu: "500m"
-          # command:
-          # - sh
-          # - -c
-          # - |
-          #   apk add --no-cache curl bash &&
-          #   curl -o /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh &&
-          #   chmod +x /usr/local/bin/wait-for-it &&
-          #   /usr/local/bin/wait-for-it base_de_datos:5432 -- java -jar /app/app.jar
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-autores-service  # Nombre para la red interna
+spec:
+  type: NodePort             # Permite acceso externo rápido en Minikube
+  selector:
+    app: app-autores         # Conecta con tu pod
+  ports:
+    - protocol: TCP
+      port: 8080             # Puerto en el Service
+      targetPort: 8080       # Puerto de tu Quarkus
+      nodePort: 30001        # (Opcional) Puerto fijo para probar fácil

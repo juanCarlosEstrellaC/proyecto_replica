@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-postgres
+  labels:
+    app: db-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-postgres
+  template:
+    metadata:
+      labels:
+        app: db-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17.5-alpine3.22
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: "labcom,2015"
+            - name: POSTGRES_DB
+              value: db_libreria
+          ports:
+            - containerPort: 5432
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: base-de-datos  # <--- ¡IMPORTANTE! Este es el nombre DNS que busca tu app
+spec:
+  selector:
+    app: db-postgres   # Busca los pods con esta etiqueta
+  ports:
+    - protocol: TCP
+      port: 5432       # Puerto expuesto al clúster
+      targetPort: 5432 # Puerto del contenedor

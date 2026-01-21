@@ -10,8 +10,8 @@
 # Acceder a la aplicación de libros: http://localhost:8080/mi-app-libros/libros
 
 # Dentro de la red de Docker, el nombre de un servicio es el que se usa para acceder a él mediante la URL.
-# Por ejemplo, en el servicio autores, se usa la URL http://autores:8080/mi-app-autores/autores.
-# En el servicio libros, se usa la URL http://libros:8080/mi-app-libros/libros. 
+# Por ejemplo, en el servicio autores, se usa la URL http://autores:8080/autores [c].
+# En el servicio libros, se usa la URL http://libros:8080/libros [c]. 
 # Por esa razón, en la configuración de fuentes de Grafana, para prometheus, la URL es: http://prometheus_metricas:9090
 
 services:
