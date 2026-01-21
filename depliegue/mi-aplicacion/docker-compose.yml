@@ -21,6 +21,11 @@ services:
       PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - "C:/db-libreria:/var/lib/postgresql/data"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     ports:
       - "5432:5432" # TODO: cambiar de "54321:5432".
     expose:
@@ -87,14 +92,10 @@ services:
     deploy:
       replicas: 1
     depends_on:
-      - base_de_datos
-      - consul
-    entrypoint: >
-      sh -c "
-      curl -o /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh &&
-      chmod +x /usr/local/bin/wait-for-it &&
-      /usr/local/bin/wait-for-it base_de_datos:5432 -- sleep 10 && java -jar /app/app.jar
-      "
+      base_de_datos:
+        condition: service_healthy
+      consul:
+        condition: service_started
 
 
   libros:
@@ -112,14 +113,10 @@ services:
     deploy:
       replicas: 1
     depends_on:
-      - base_de_datos
-      - consul
-    entrypoint: >
-      sh -c "
-      curl -o /usr/local/bin/wait-for-it https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh &&
-      chmod +x /usr/local/bin/wait-for-it &&
-      /usr/local/bin/wait-for-it base_de_datos:5432 -- java -jar /app/app.jar
-      "
+      base_de_datos:
+        condition: service_healthy
+      consul:
+        condition: service_started
 
 
   prometheus_metricas:
