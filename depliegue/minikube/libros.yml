@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: libros
+  labels:
+    app: libros
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: libros
+  template:
+    metadata:
+      labels:
+        app: libros
+    spec:
+      containers:
+        - name: libros
+          image: jcestrella/app-libros:v1.2.1
+          env:
+            - name: QUARKUS_DATASOURCE_USERNAME
+              value: postgres
+            - name: QUARKUS_DATASOURCE_PASSWORD
+              value: "labcom,2015"
+            - name: QUARKUS_DATASOURCE_JDBC_URL
+              value: jdbc:postgresql://base-de-datos:5432/db_libreria
+            - name: QUARKUS_HTTP_PORT
+              value: "8080"
+            - name: QUARKUS_HTTP_HOST
+              value: "0.0.0.0"
+            - name: CONSUL_HOST
+              value: consul
+            - name: CONSUL_PORT
+              value: "8500"
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: libros
+spec:
+  selector:
+    app: libros
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

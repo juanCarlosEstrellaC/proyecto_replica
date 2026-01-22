@@ -1,31 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-autores
+  name: autores
   labels:
-    app: app-autores
+    app: autores
 spec:
-  replicas: 1
+  replicas: 5
   selector:
     matchLabels:
-     app: app-autores
+      app: autores
   template:
     metadata:
       labels:
-        app: app-autores
+        app: autores
     spec:
       containers:
-        - name: app-autores
+        - name: autores
           image: jcestrella/app-autores:v1.2.1
           env:
             - name: QUARKUS_DATASOURCE_USERNAME
               value: postgres
             - name: QUARKUS_DATASOURCE_PASSWORD
-              value: labcom,2015
+              value: "labcom,2015"
             - name: QUARKUS_DATASOURCE_JDBC_URL
               value: jdbc:postgresql://base-de-datos:5432/db_libreria
             - name: QUARKUS_HTTP_PORT
               value: "8080"
+            - name: QUARKUS_HTTP_HOST
+              value: "0.0.0.0"
             - name: CONSUL_HOST
               value: consul
             - name: CONSUL_PORT
@@ -36,18 +38,16 @@ spec:
             requests:
               memory: "512Mi"
               cpu: "500m"
-
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: app-autores-service  # Nombre para la red interna
+  name: autores
 spec:
-  type: NodePort             # Permite acceso externo rápido en Minikube
+  type: NodePort
   selector:
-    app: app-autores         # Conecta con tu pod
+    app: autores
   ports:
     - protocol: TCP
-      port: 8080             # Puerto en el Service
-      targetPort: 8080       # Puerto de tu Quarkus
-      nodePort: 30001        # (Opcional) Puerto fijo para probar fácil
+      port: 8080
+      targetPort: 8080
