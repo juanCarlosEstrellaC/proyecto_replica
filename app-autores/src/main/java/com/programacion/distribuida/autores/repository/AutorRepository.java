@@ -19,6 +19,6 @@ public class AutorRepository implements PanacheRepositoryBase<Autor, Integer> {
      */
     public List<Autor> buscarPorLibro(String isbn) {
         // Consulta JPQL para buscar los autores por el ISBN del libro.
-        return this.find("SELECT la.autor FROM LibroAutor la WHERE la.id.libroIsbn = ?1", isbn).list();
+        return this.find("SELECT la.autor FROM AutorLibro la WHERE la.id.libroIsbn = ?1", isbn).list();
     }
 }

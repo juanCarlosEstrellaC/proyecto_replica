@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Embeddable
-public class LibroAutorId {
+public class AutorLibroId {
 
     @Column(name = "libro_isbn")
     private String libroIsbn;

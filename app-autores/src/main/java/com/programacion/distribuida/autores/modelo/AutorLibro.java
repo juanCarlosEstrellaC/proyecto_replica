@@ -7,11 +7,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "libros_autores")
-public class LibroAutor {
+@Table(name = "autores_libros")
+public class AutorLibro {
 
     @EmbeddedId
-    private LibroAutorId id;
+    private AutorLibroId id;
 
     @ManyToOne
     @MapsId("autorId")

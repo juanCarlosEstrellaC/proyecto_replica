@@ -8,13 +8,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "inventario")
+@Table(name = "inventarios")
 public class Inventario {
 
     @Id
     @OneToOne
     @JsonbTransient  //TODO: Use esto para evitar bucle infinito en serialización JSON
-    @JoinColumn(name = "isbn")
+    @JoinColumn(name = "libro_isbn")
     private Libro libro;
 
     @Column(name = "vendidos")
@@ -22,4 +22,7 @@ public class Inventario {
 
     @Column(name = "suministrados")
     private Integer suministrado;
+
+    @Column(name = "version")
+    private Integer version;
 }
